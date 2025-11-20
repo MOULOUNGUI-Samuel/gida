@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('demandes', function (Blueprint $table) {
-            // Modifie la colonne societe_assignee pour accepter n'importe quelle chaîne
-            DB::statement('ALTER TABLE demandes MODIFY societe_assignee VARCHAR(255);');
+            // Vérifie si la colonne existe et la modifie proprement
+            if (Schema::hasColumn('demandes', 'societe_assignee')) {
+                $table->string('societe_assignee', 255)->nullable()->change();
+            }
         });
     }
 
@@ -23,8 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('demandes', function (Blueprint $table) {
-            // Rétablit l'enum d'origine
-            DB::statement("ALTER TABLE demandes MODIFY societe_assignee ENUM('COMKETING', 'YOD INGÉNIERIE', 'FCI', 'ALPHON CONSULTING') NULL;");
+            // Retour à une version stricte (ou ce que tu veux)
+            if (Schema::hasColumn('demandes', 'societe_assignee')) {
+                $table->string('societe_assignee', 255)->nullable(false)->change();
+            }
         });
     }
 };

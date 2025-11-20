@@ -19,6 +19,7 @@ class CreateDemandesTable extends Migration
             $table->string('fonction')->nullable();
             $table->string('societe')->nullable();
             $table->text('description');
+            
             $table->string('mail'); // utilisé pour stocker l’email
             $table->text('infos_supplementaires')->nullable();
             $table->string('fichier')->nullable();
