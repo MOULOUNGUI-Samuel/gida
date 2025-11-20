@@ -7,6 +7,7 @@ use App\Http\Controllers\NouvelleDemandeController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\EntrepriseController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Route d'accueil: afficher le formulaire de connexion si non authentifié.
@@ -75,13 +76,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Routes pour les demandes (CRUD)
     Route::resource('demandes', DemandesController::class);
     Route::patch('/demandes/{demande}/status', [DemandesController::class, 'updateStatus'])->name('demandes.updateStatus');
-    
+
     // Routes pour les évaluations
     Route::resource('evaluations', \App\Http\Controllers\EvaluationController::class)->only(['store']);
-    
+
     //Routes Notifications
     Route::get('/notification/{id}', [NotificationController::class, 'notification_show'])->name('notifications.notification_show');
     Route::get('/notificationAdmin/{id}', [NotificationController::class, 'notificationAdmin_show'])->name('notifications.notificationAdmin_show');
+
+    // Routes pour les entreprises
+    Route::resource('entreprises', EntrepriseController::class);
+    Route::get('/entreprises/{entreprise}/add-users', [EntrepriseController::class, 'addUsers'])->name('entreprises.add-users');
+    Route::post('/entreprises/{entreprise}/attach-users', [EntrepriseController::class, 'attachUsers'])->name('entreprises.attach-users');
+    Route::delete('/entreprises/{entreprise}/users/{user}', [EntrepriseController::class, 'detachUser'])->name('entreprises.detach-user');
+    Route::patch('/entreprises/{entreprise}/toggle-active', [EntrepriseController::class, 'toggleActive'])->name('entreprises.toggle-active');
 
     
     // API Routes pour la gestion des utilisateurs

@@ -14,10 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Appel des seeders
+        // Appel des seeders dans l'ordre correct
         $this->call([
+            EntrepriseSeeder::class,  // D'abord les entreprises
             AdminUserSeeder::class,
             AddUsersSeeder::class,
+            UserSeeder::class,        // Puis les utilisateurs de test
         ]);
     }
 }

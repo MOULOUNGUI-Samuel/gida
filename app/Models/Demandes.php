@@ -124,17 +124,7 @@ class Demandes extends Model
         return $this->belongsTo(User::class, 'validateur_id');
     }
 
-    // Relation avec les logs de workflow
-    public function workflowLogs()
-    {
-        return $this->hasMany(WorkflowLog::class, 'demande_id');
-    }
 
-    // Relation avec les communications
-    public function communications()
-    {
-        return $this->hasMany(Communication::class, 'demande_id');
-    }
 
     /**
      * SCOPES GIDA POUR REQUÊTES OPTIMISÉES

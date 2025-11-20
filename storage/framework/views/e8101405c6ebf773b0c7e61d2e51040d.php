@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'GIDA') }} - Administration</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo e(config('app.name', 'GIDA')); ?> - Administration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <style>
@@ -322,61 +322,61 @@
 <body>
     <!-- Sidebar -->
     <aside class="admin-sidebar">
-        <header>{{ auth()->user()->type == 0 ? 'GIDA ADMIN' : 'SUPPORT' }}</header>
+        <header><?php echo e(auth()->user()->type == 0 ? 'GIDA ADMIN' : 'SUPPORT'); ?></header>
         <nav>
             <ul>
-                @if(auth()->user()->type == 0)
+                <?php if(auth()->user()->type == 0): ?>
                 <!-- Menu Admin -->
-                <li onclick="window.location.href='{{ route('dashboard') }}'" class="nav-dashboard">
+                <li onclick="window.location.href='<?php echo e(route('dashboard')); ?>'" class="nav-dashboard">
                     <span class="icon">📊</span>
                     <span>Dashboard</span>
                 </li>
-                <li onclick="window.location.href='{{ route('reporting') }}'" class="nav-reporting">
+                <li onclick="window.location.href='<?php echo e(route('reporting')); ?>'" class="nav-reporting">
                     <span class="icon">📈</span>
                     <span>Reporting & KPI</span>
                 </li>
-                <li onclick="window.location.href='{{ route('users') }}'" class="nav-users">
+                <li onclick="window.location.href='<?php echo e(route('users')); ?>'" class="nav-users">
                     <span class="icon">👥</span>
                     <span>Gestion des utilisateurs</span>
                 </li>
-                <li onclick="window.location.href='{{ route('entreprises.index') }}'" class="nav-entreprises">
+                <li onclick="window.location.href='<?php echo e(route('entreprises.index')); ?>'" class="nav-entreprises">
                     <span class="icon">🏢</span>
                     <span>Gestion des entreprises</span>
                 </li>
-                <li onclick="window.location.href='{{ route('notificationAdmin') }}'">
+                <li onclick="window.location.href='<?php echo e(route('notificationAdmin')); ?>'">
                     <span class="icon">🔔</span>
                     <span>Notifications</span>
-                    @if($nombre_notification_admin > 0)
-                        <span class="nombre-notification">{{ $nombre_notification_admin }}</span>
-                    @endif
+                    <?php if($nombre_notification_admin > 0): ?>
+                        <span class="nombre-notification"><?php echo e($nombre_notification_admin); ?></span>
+                    <?php endif; ?>
                 </li>
-                @else
+                <?php else: ?>
                 <!-- Menu Support Entreprise -->
-                <li onclick="window.location.href='{{ route('supportEntreprise.home') }}'" class="nav-home">
+                <li onclick="window.location.href='<?php echo e(route('supportEntreprise.home')); ?>'" class="nav-home">
                     <span class="icon">🏠</span>
                     <span>Accueil</span>
                 </li>
-                <li onclick="window.location.href='{{ route('supportEntreprise.dashboard') }}'" class="nav-dashboard">
+                <li onclick="window.location.href='<?php echo e(route('supportEntreprise.dashboard')); ?>'" class="nav-dashboard">
                     <span class="icon">📥</span>
                     <span>Demandes</span>
                 </li>
-                <li onclick="window.location.href='{{ route('supportEntreprise.historique') }}'" class="nav-historique">
+                <li onclick="window.location.href='<?php echo e(route('supportEntreprise.historique')); ?>'" class="nav-historique">
                     <span class="icon">🕓</span>
                     <span>Historique</span>
                 </li>
-                <li onclick="window.location.href='{{ route('supportEntreprise.profil') }}'" class="nav-profil">
+                <li onclick="window.location.href='<?php echo e(route('supportEntreprise.profil')); ?>'" class="nav-profil">
                     <span class="icon">👤</span>
                     <span>Profil</span>
                 </li>
-                <li onclick="window.location.href='{{ route('supportEntreprise.notifications') }}'" class="nav-notifications">
+                <li onclick="window.location.href='<?php echo e(route('supportEntreprise.notifications')); ?>'" class="nav-notifications">
                     <span class="icon">🔔</span>
                     <span>Notifications</span>
                 </li>
-                @endif
+                <?php endif; ?>
 
                 <li class="logout">
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0; padding: 0;">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" style="display: inline; margin: 0; padding: 0;">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; width: 100%; padding: 0; font: inherit;">
                             <span class="icon">🚪</span>
                             <span>Déconnexion</span>
@@ -389,7 +389,7 @@
 
     <!-- Contenu principal -->
     <main class="admin-main" aria-label="Contenu principal">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> 
     <script>
@@ -436,3 +436,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH C:\xampp\htdocs\Gida\resources\views/layouts/appAdministration.blade.php ENDPATH**/ ?>

@@ -60,7 +60,7 @@ class HomeController extends Controller
         }
         
         // Récupérer l'utilisateur connecté avec sa relation entreprise
-        $user = auth()->user();
+        $user = Auth::user();
         
         // Vérifier si l'utilisateur a une entreprise
         if (!$user->entreprise) {

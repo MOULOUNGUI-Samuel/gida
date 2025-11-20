@@ -29,7 +29,8 @@ class User extends Authenticatable
         'email',
         'entreprise_id',
         'nedcore_user_id',
-        'fonction', // Changez 'fonction' en 'fonction_id'
+        'fonction',
+        'fonction_id',
     ];
 
     /**
@@ -46,10 +47,9 @@ class User extends Authenticatable
      * Get the entreprise that owns the user.
      */
     public function entreprise()
-{
-    return $this->belongsTo(Entreprise::class, 'entreprise_id');
-}
-
+    {
+        return $this->belongsTo(Entreprise::class, 'entreprise_id');
+    }
 
     /**
      * Get the fonction that owns the user.
@@ -81,10 +81,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function company()
-{
-    return $this->belongsTo(Company::class, 'company_id'); // ou le nom exact de ta colonne
-}
 
 
 }

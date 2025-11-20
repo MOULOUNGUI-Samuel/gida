@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -19,25 +20,28 @@ class UserController extends Controller
     {
         try {
             // Récupération des utilisateurs avec mapping des champs de la BDD vers l'interface
-            $users = User::select('id', 'nom as name', 'type', 'code_entreprise as company')
+            $users = User::with('entreprise')
+                         ->select('id', 'nom as name', 'type', 'code_entreprise as company', 'entreprise_id')
                          ->orderBy('created_at', 'desc')
                          ->get()
                          ->map(function ($user) {
                              // Conversion du type numérique vers un rôle lisible
                              $roleMap = [
-                                 0 => 'Admin',        // Type 0 = Administrateur
-                                 1 => 'Gestionnaire', // Type 1 = Gestionnaire 
-                                 2 => 'employe'       // Type 2 = Support/Employé
+                                 0 => 'Administrateur',      // Type 0 = Administrateur
+                                 1 => 'Employe',             // Type 1 = Employé
+                                 2 => 'Entreprise Support'   // Type 2 = Support Entreprise
                              ];
-                             
+
                              return [
                                  'id' => $user->id,
                                  'name' => $user->name,
-                                 'role' => $roleMap[$user->type] ?? 'employe',
-                                 'company' => $user->company ?? 'Non définie'
+                                 'role' => $roleMap[$user->type] ?? 'Employe',
+                                 'company' => $user->company ?? 'Non définie',
+                                 'entreprise_id' => $user->entreprise_id,
+                                 'entreprise_nom' => $user->entreprise ? $user->entreprise->nom : null
                              ];
                          });
-            
+
             return response()->json($users);
         } catch (\Exception $e) {
             return response()->json([
@@ -56,9 +60,10 @@ class UserController extends Controller
         // Validation des données reçues du formulaire
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'role' => 'required|string|in:Admin,Gestionnaire,Support',
+            'role' => 'required|string|in:Administrateur,Employe,Entreprise Support',
             'company' => 'required|string|max:255',
             'password' => 'required|string|min:6',
+            'entreprise_id' => 'nullable|exists:entreprise,id',
         ]);
 
         if ($validator->fails()) {
@@ -71,16 +76,17 @@ class UserController extends Controller
         try {
             // Conversion du rôle texte vers le type numérique de la BDD
             $typeMap = [
-                'Admin' => 0,        // Admin = type 0
-                'Gestionnaire' => 1, // Gestionnaire = type 1
-                'employe' => 2       // Support = type 2
+                'Administrateur' => 0,        // Administrateur = type 0
+                'Employe' => 1,               // Employé = type 1
+                'Entreprise Support' => 2     // Support Entreprise = type 2
             ];
-            
+
             // Création de l'utilisateur avec les champs de la BDD
             $user = User::create([
                 'nom' => $request->name,                    // nom au lieu de name
                 'type' => $typeMap[$request->role],         // type numérique au lieu de role
                 'code_entreprise' => $request->company,     // code_entreprise au lieu de company
+                'entreprise_id' => $request->entreprise_id, // ID de l'entreprise
                 'username' => strtolower(str_replace(' ', '.', $request->name)), // génération automatique du username
                 'matricule' => 'USR' . time(),              // génération automatique du matricule
                 'password' => Hash::make($request->password), // mot de passe fourni par l'utilisateur
@@ -94,6 +100,7 @@ class UserController extends Controller
                     'name' => $user->nom,
                     'role' => $request->role,
                     'company' => $user->code_entreprise,
+                    'entreprise_id' => $user->entreprise_id,
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -134,9 +141,10 @@ class UserController extends Controller
         // Validation des données reçues
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'role' => 'required|string|in:Admin,Gestionnaire,Support',
+            'role' => 'required|string|in:Administrateur,Employe,Entreprise Support',
             'company' => 'required|string|max:255',
             'password' => 'nullable|string|min:6',
+            'entreprise_id' => 'nullable|exists:entreprise,id',
         ]);
 
         if ($validator->fails()) {
@@ -149,16 +157,17 @@ class UserController extends Controller
         try {
             // Conversion du rôle texte vers le type numérique
             $typeMap = [
-                'Admin' => 0,
-                'Gestionnaire' => 1,
-                'employe' => 2
+                'Administrateur' => 0,        // Administrateur = type 0
+                'Employe' => 1,               // Employé = type 1
+                'Entreprise Support' => 2     // Support Entreprise = type 2
             ];
-            
+
             // Préparation des données à mettre à jour avec les vrais champs de la BDD
             $updateData = [
                 'nom' => $request->name,                    // nom au lieu de name
                 'type' => $typeMap[$request->role],         // type numérique au lieu de role
                 'code_entreprise' => $request->company,     // code_entreprise au lieu de company
+                'entreprise_id' => $request->entreprise_id, // ID de l'entreprise
             ];
 
             // Ajouter le mot de passe seulement s'il est fourni
@@ -177,6 +186,7 @@ class UserController extends Controller
                     'name' => $user->nom,
                     'role' => $request->role,
                     'company' => $user->code_entreprise,
+                    'entreprise_id' => $user->entreprise_id,
                 ]
             ]);
         } catch (\Exception $e) {

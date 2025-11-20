@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\DemandeUpdated; // ⚡ import correct
 use Illuminate\Support\Facades\Storage;
 use App\Models\PieceJointe;
+use Illuminate\Support\Facades\Log;
 
 class DemandesController extends Controller
 {
@@ -28,6 +29,40 @@ class DemandesController extends Controller
     public function create()
     {
         return view('demandes.create');
+    }
+
+    public function assignDemande(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'demande_id' => 'required|exists:demandes,id',
+                'societe'    => 'required|string|max:255',
+                'statut'     => 'required|string|in:en attente,en cours,à risque,clôturé',
+            ]);
+
+            $demande = Demandes::findOrFail($data['demande_id']);
+
+            $entreprise = \App\Models\Entreprise::where('nom', $data['societe'])->first();
+
+            $demande->update([
+                'societe_assignee' => $data['societe'],
+                'entreprise_id'    => $entreprise?->id,
+                'statut'           => $data['statut'],
+            ]);
+
+            // notifications support + event comme tu avais
+            // ...
+
+            return redirect()
+                ->back()
+                ->with('success', 'Demande affectée avec succès.');
+        } catch (\Exception $e) {
+            Log::error("Erreur assignDemande : " . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', "Erreur lors de l'affectation : " . $e->getMessage());
+        }
     }
 
     /**
@@ -61,7 +96,9 @@ class DemandesController extends Controller
 
         if ($request->hasFile('fichiers')) {
             foreach ($request->file('fichiers') as $pj) {
-                if (!$pj) { continue; }
+                if (!$pj) {
+                    continue;
+                }
                 $name = time() . '_' . $pj->getClientOriginalName();
                 $stored = $pj->storeAs('pieces_jointes', $name, 'public');
                 PieceJointe::create([
@@ -76,7 +113,7 @@ class DemandesController extends Controller
         }
 
         return redirect()->route('dashboardEmployer')
-                        ->with('success', 'Demande créée avec succès !');
+            ->with('success', 'Demande créée avec succès !');
     }
 
     /**
@@ -124,7 +161,9 @@ class DemandesController extends Controller
 
         if ($request->hasFile('fichiers')) {
             foreach ($request->file('fichiers') as $pj) {
-                if (!$pj) { continue; }
+                if (!$pj) {
+                    continue;
+                }
                 $name = time() . '_' . $pj->getClientOriginalName();
                 $stored = $pj->storeAs('pieces_jointes', $name, 'public');
                 PieceJointe::create([
@@ -163,77 +202,43 @@ class DemandesController extends Controller
     /**
      * Mettre à jour uniquement le statut (AJAX)
      */
+    // App\Http\Controllers\DemandesController.php
+
     public function updateStatus(Request $request, Demandes $demande)
     {
+        // Autorisation très simple (à adapter avec policies si besoin)
+        // Exemple : type 0 = admin, type 2 = support
+        if (!in_array(Auth::user()->type, [0, 2])) {
+            return response()->json([
+                'success' => false,
+                'message' => "Vous n'êtes pas autorisé à traiter cette demande."
+            ], 403);
+        }
+
         $request->validate([
-            'statut' => 'required|string|in:en attente,en cours,à risque,clôturé'
+            'statut' => 'required|string|in:en attente,en cours,à risque,clôturé',
+            'infos_supplementaires' => 'nullable|string'
         ]);
 
-        $demande->update(['statut' => $request->statut]);
+        $demande->update([
+            'statut' => $request->statut,
+            'infos_supplementaires' => $request->infos_supplementaires,
+        ]);
 
         // ⚡ Diffusion en temps réel
         event(new DemandeUpdated($demande));
 
-        return response()->json(['success' => true, 'message' => 'Statut mis à jour']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Statut mis à jour avec succès',
+            'demande' => [
+                'id' => $demande->id,
+                'statut' => $demande->statut,
+                'infos_supplementaires' => $demande->infos_supplementaires,
+            ],
+        ]);
     }
 
-    public function assignDemande(Request $request)
-    {
-        try {
-            $request->validate([
-                'demande_id' => 'required|exists:demandes,id',
-                'societe' => 'required|string|max:255',
-                'statut' => 'required|string|in:en attente,en cours,à risque,clôturé'
-            ]);
 
-            $demande = Demandes::findOrFail($request->demande_id);
-
-            // Trouver l'entreprise par son nom
-            $entreprise = \App\Models\Entreprise::where('nom', $request->societe)->first();
-
-            $demande->update([
-                'societe_assignee' => $request->societe,
-                'entreprise_id' => $entreprise ? $entreprise->id : null,
-                'statut' => $request->statut
-            ]);
-
-            // Notify support users of that entreprise (type == 2)
-            if ($entreprise) {
-                $supportUsers = \App\Models\User::where('entreprise_id', $entreprise->id)
-                    ->where('type', 2)
-                    ->get();
-
-                foreach ($supportUsers as $su) {
-                    try {
-                        \App\Models\Notifications::create([
-                            'id_demande' => $demande->id,
-                            'id_user' => $su->id,
-                            'message' => "Nouvelle demande assignée: #{$demande->reference} - {$demande->titre}",
-                            'type_notification' => 'assignment',
-                            'read' => 0
-                        ]);
-                    } catch (\Exception $e) {
-                        // Ignorer les erreurs de notification
-                        \Log::warning("Erreur lors de l'envoi de la notification: " . $e->getMessage());
-                    }
-                }
-            }
-
-            // ⚡ Diffusion en temps réel si besoin
-            event(new \App\Events\DemandeUpdated($demande));
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Demande mise à jour avec succès',
-                'data' => $demande
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error("Erreur lors de l'affectation de la demande: " . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => "Une erreur est survenue lors de l'affectation: " . $e->getMessage()
-            ], 500);
-        }
-    }
+  
 }

@@ -1,81 +1,77 @@
-@extends(Auth::user()->type == 1 ? 'layouts.appEmployer' : 'layouts.appAdministration')
 
-@section('title', 'Détails de la demande - GIDA')
 
-@section('content')
+<?php $__env->startSection('title', 'Détails de la demande - GIDA'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container my-4">
 
-    {{-- HEADER UTILISATEUR + CTA --}}
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 mb-0">Détails de la demande #{{ $demande->id }}</h1>
+        <h1 class="h4 mb-0">Détails de la demande #<?php echo e($demande->id); ?></h1>
 
-        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
+        <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary btn-sm">
             &larr; Retour
         </a>
         
     </div>
 
-    {{-- DÉTAILS DE LA DEMANDE --}}
+    
     <section class="demande-details" id="section-details">
         <div class="card shadow-sm mb-4">
             <div class="card-body">
 
-                {{-- Titre de la demande --}}
+                
                 <div class="demande-header mb-4">
-                    <h2 class="h5 mb-1">{{ $demande->titre }}</h2>
-                    {{-- Exemple si tu veux ré-afficher la référence / date:
-                    <div class="small text-muted">
-                        Référence: TK-{{ str_pad($demande->id, 5, '0', STR_PAD_LEFT) }} |
-                        Créée le: {{ $demande->formatted_created_at }}
-                    </div>
-                    --}}
+                    <h2 class="h5 mb-1"><?php echo e($demande->titre); ?></h2>
+                    
                 </div>
 
-                {{-- Grille d'informations --}}
+                
                 <div class="row g-4 mb-3">
 
-                    {{-- Colonne gauche : infos demande --}}
+                    
                     <div class="col-md-7">
                         <h3 class="h6 border-bottom pb-2 mb-3">Informations de la demande</h3>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Catégorie :</label>
-                            <div>{{ $demande->categorie }}</div>
+                            <div><?php echo e($demande->categorie); ?></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Priorité :</label>
                             <div>
                                 <span class="badge
-                                    @if(strtolower($demande->priorite) === 'normale') bg-success
-                                    @elseif(strtolower($demande->priorite) === 'urgente') bg-warning text-dark
-                                    @elseif(strtolower($demande->priorite) === 'critique') bg-danger
-                                    @else bg-secondary
-                                    @endif
+                                    <?php if(strtolower($demande->priorite) === 'normale'): ?> bg-success
+                                    <?php elseif(strtolower($demande->priorite) === 'urgente'): ?> bg-warning text-dark
+                                    <?php elseif(strtolower($demande->priorite) === 'critique'): ?> bg-danger
+                                    <?php else: ?> bg-secondary
+                                    <?php endif; ?>
                                 ">
-                                    {{ $demande->priorite }}
+                                    <?php echo e($demande->priorite); ?>
+
                                 </span>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Date limite :</label>
-                            <div>{{ $demande->date_limite ? $demande->date_limite->format('d/m/Y') : 'Non définie' }}</div>
+                            <div><?php echo e($demande->date_limite ? $demande->date_limite->format('d/m/Y') : 'Non définie'); ?></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Description :</label>
                             <div class="bg-light border-start border-primary border-4 rounded py-2 px-3">
-                                <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;">{{ $demande->description }}</pre>
+                                <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;"><?php echo e($demande->description); ?></pre>
                             </div>
                         </div>
 
-                        {{-- Progression du traitement --}}
+                        
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Progression du traitement :</label>
 
                             <div class="progress-container mt-2">
-                                @php
+                                <?php
                                     $statuses = [
                                         'en attente' => ['icon' => '⏳', 'class' => 'status-pending'],
                                         'en cours'   => ['icon' => '🔄', 'class' => 'status-in-progress'],
@@ -85,134 +81,140 @@
                                     $currentStatus = !empty($demande->statut) ? strtolower($demande->statut) : 'en attente';
                                     $currentIndex  = array_search($currentStatus, array_keys($statuses));
                                     $progress      = $currentIndex !== false ? (($currentIndex + 1) / count($statuses)) * 100 : 0;
-                                @endphp
+                                ?>
 
                                 <div class="progress-track mb-3">
-                                    @foreach($statuses as $status => $data)
-                                        @php
+                                    <?php $__currentLoopData = $statuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status => $data): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
                                             $isActive  = array_search($status, array_keys($statuses)) <= $currentIndex;
                                             $isCurrent = $status === $currentStatus;
-                                        @endphp
+                                        ?>
 
-                                        <div class="progress-step {{ $isActive ? 'active' : '' }} {{ $isCurrent ? 'current' : '' }}">
-                                            <div class="step-icon {{ $data['class'] }}">
-                                                {{ $data['icon'] }}
+                                        <div class="progress-step <?php echo e($isActive ? 'active' : ''); ?> <?php echo e($isCurrent ? 'current' : ''); ?>">
+                                            <div class="step-icon <?php echo e($data['class']); ?>">
+                                                <?php echo e($data['icon']); ?>
+
                                             </div>
-                                            <div class="step-label">{{ ucfirst($status) }}</div>
+                                            <div class="step-label"><?php echo e(ucfirst($status)); ?></div>
                                         </div>
 
-                                        @if(!$loop->last)
+                                        <?php if(!$loop->last): ?>
                                             <div class="progress-connector">
-                                                <div class="progress-line {{ $isActive ? 'active' : '' }}" style="width: {{ $isActive ? '100%' : '0%' }}"></div>
+                                                <div class="progress-line <?php echo e($isActive ? 'active' : ''); ?>" style="width: <?php echo e($isActive ? '100%' : '0%'); ?>"></div>
                                             </div>
-                                        @endif
-                                    @endforeach
+                                        <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
 
                                 <div class="progress-bar-container mb-2">
                                     <div class="progress" style="height: 10px;">
                                         <div
                                             class="progress-bar
-                                                @if($currentStatus === 'en attente') bg-warning
-                                                @elseif($currentStatus === 'en cours') bg-info
-                                                @elseif($currentStatus === 'à risque') bg-danger
-                                                @elseif($currentStatus === 'clôturé') bg-success
-                                                @else bg-secondary
-                                                @endif
+                                                <?php if($currentStatus === 'en attente'): ?> bg-warning
+                                                <?php elseif($currentStatus === 'en cours'): ?> bg-info
+                                                <?php elseif($currentStatus === 'à risque'): ?> bg-danger
+                                                <?php elseif($currentStatus === 'clôturé'): ?> bg-success
+                                                <?php else: ?> bg-secondary
+                                                <?php endif; ?>
                                             "
                                             role="progressbar"
-                                            style="width: {{ $progress }}%;"
-                                            aria-valuenow="{{ round($progress) }}"
+                                            style="width: <?php echo e($progress); ?>%;"
+                                            aria-valuenow="<?php echo e(round($progress)); ?>"
                                             aria-valuemin="0"
                                             aria-valuemax="100"
                                             id="progress-bar"
                                         ></div>
                                     </div>
                                     <div class="text-end small text-muted mt-1">
-                                        {{ round($progress) }}%
+                                        <?php echo e(round($progress)); ?>%
                                     </div>
                                 </div>
 
                                 <div class="current-status text-center mt-2">
                                     <span class="badge rounded-pill
-                                        @if($currentStatus === 'en attente') bg-warning text-dark
-                                        @elseif($currentStatus === 'en cours') bg-info text-dark
-                                        @elseif($currentStatus === 'à risque') bg-danger
-                                        @elseif($currentStatus === 'clôturé') bg-success
-                                        @else bg-secondary
-                                        @endif
+                                        <?php if($currentStatus === 'en attente'): ?> bg-warning text-dark
+                                        <?php elseif($currentStatus === 'en cours'): ?> bg-info text-dark
+                                        <?php elseif($currentStatus === 'à risque'): ?> bg-danger
+                                        <?php elseif($currentStatus === 'clôturé'): ?> bg-success
+                                        <?php else: ?> bg-secondary
+                                        <?php endif; ?>
                                         status
                                     ">
-                                        {{ $statuses[$currentStatus]['icon'] ?? '⏳' }}
-                                        Statut actuel : {{ ucfirst($currentStatus) }}
+                                        <?php echo e($statuses[$currentStatus]['icon'] ?? '⏳'); ?>
+
+                                        Statut actuel : <?php echo e(ucfirst($currentStatus)); ?>
+
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        @if($demande->infos_supplementaires)
+                        <?php if($demande->infos_supplementaires): ?>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold mb-1">Informations supplémentaires :</label>
                                 <div class="bg-light rounded py-2 px-3 border">
                                     <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;">
-{{ $demande->infos_supplementaires }}</pre>
+<?php echo e($demande->infos_supplementaires); ?></pre>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
-                    {{-- Colonne droite : infos demandeur --}}
+                    
                     <div class="col-md-5">
                         <h3 class="h6 border-bottom pb-2 mb-3">Informations du demandeur</h3>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Nom :</label>
-                            <div>{{ $demande->nom }}</div>
+                            <div><?php echo e($demande->nom); ?></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Société :</label>
                             <div class="fw-semibold">
-                                @if($demande->user->societe)
-                                    {{ $demande->user->societe }}
-                                @elseif($demande->user->entreprise)
-                                    {{ $demande->user->entreprise->nom }}
-                                @else
+                                <?php if($demande->user->societe): ?>
+                                    <?php echo e($demande->user->societe); ?>
+
+                                <?php elseif($demande->user->entreprise): ?>
+                                    <?php echo e($demande->user->entreprise->nom); ?>
+
+                                <?php else: ?>
                                     <span class="text-muted">Entreprise non définie</span>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold mb-1">Email :</label>
-                            <div>{{ $demande->mail }}</div>
+                            <div><?php echo e($demande->mail); ?></div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Pièces jointes --}}
-                @if($demande->fichier || ($demande->piecesJointes && $demande->piecesJointes->count()))
+                
+                <?php if($demande->fichier || ($demande->piecesJointes && $demande->piecesJointes->count())): ?>
                     <div class="mt-3">
                         <h3 class="h6 border-bottom pb-2 mb-3">Pièces jointes</h3>
 
                         <div class="list-group mb-3">
-                            @if($demande->fichier)
-                                <a href="#" onclick="openFileModal('{{ asset('storage/' . $demande->fichier) }}')" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <?php if($demande->fichier): ?>
+                                <a href="#" onclick="openFileModal('<?php echo e(asset('storage/' . $demande->fichier)); ?>')" class="list-group-item list-group-item-action d-flex align-items-center">
                                     <span class="me-2">📂</span> Voir la pièce jointe
                                 </a>
-                            @endif
+                            <?php endif; ?>
 
-                            @if($demande->piecesJointes && $demande->piecesJointes->count())
-                                @foreach($demande->piecesJointes as $pj)
-                                    <a href="#" onclick="openFileModal('{{ asset('storage/' . $pj->chemin) }}')" class="list-group-item list-group-item-action d-flex align-items-center">
-                                        <span class="me-2">📎</span> {{ $pj->nom_fichier }}
+                            <?php if($demande->piecesJointes && $demande->piecesJointes->count()): ?>
+                                <?php $__currentLoopData = $demande->piecesJointes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pj): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <a href="#" onclick="openFileModal('<?php echo e(asset('storage/' . $pj->chemin)); ?>')" class="list-group-item list-group-item-action d-flex align-items-center">
+                                        <span class="me-2">📎</span> <?php echo e($pj->nom_fichier); ?>
+
                                     </a>
-                                @endforeach
-                            @endif
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    {{-- Modal Bootstrap pour l'aperçu du fichier --}}
+                    
                     <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content">
@@ -247,39 +249,39 @@
                             modal.show();
                         }
                     </script>
-                @endif
+                <?php endif; ?>
 
-                {{-- Actions générales (bas de la fiche) --}}
+                
                 <div class="demande-actions border-top pt-3 mt-4">
-                    @if(auth()->user()->type == 0) {{-- Admin --}}
+                    <?php if(auth()->user()->type == 0): ?> 
                         <div class="admin-actions">
                             <h3 class="h6 mb-3">Actions administrateur</h3>
                             <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ route('demandes.edit', $demande->id) }}" class="btn btn-primary btn-sm">
+                                <a href="<?php echo e(route('demandes.edit', $demande->id)); ?>" class="btn btn-primary btn-sm">
                                     Modifier le statut
                                 </a>
-                                <a href="{{ route('dashboardEmployer') }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?php echo e(route('dashboardEmployer')); ?>" class="btn btn-outline-secondary btn-sm">
                                     Retour à la liste
                                 </a>
                             </div>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="user-actions">
                             <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ route('dashboardEmployer') }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?php echo e(route('dashboardEmployer')); ?>" class="btn btn-outline-secondary btn-sm">
                                     Retour au tableau de bord
                                 </a>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-            </div> {{-- card-body --}}
-        </div> {{-- card --}}
+            </div> 
+        </div> 
     </section>
 
-    {{-- BLOC DE TRAITEMENT DE LA DEMANDE (Support / Admin) --}}
-    @if(in_array(Auth::user()->type, [0, 2]) && strtolower($demande->statut) !== 'clôturé')
+    
+    <?php if(in_array(Auth::user()->type, [0, 2]) && strtolower($demande->statut) !== 'clôturé'): ?>
         <section class="mt-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -288,20 +290,20 @@
                         Mettez à jour le statut de la demande et ajoutez des informations sur le traitement effectué.
                     </p>
 
-                    <form id="form-traitement-demande" action="{{ route('demandes.updateStatus', $demande) }}" method="POST" class="row g-3">
-                        @csrf
-                        @method('PATCH')
+                    <form id="form-traitement-demande" action="<?php echo e(route('demandes.updateStatus', $demande)); ?>" method="POST" class="row g-3">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
 
                         <div class="col-md-4">
                             <label for="statut" class="form-label">Statut de la demande *</label>
-                            @php
+                            <?php
                                 $statutActuel = strtolower($demande->statut ?? 'en attente');
-                            @endphp
+                            ?>
                             <select name="statut" id="statut" class="form-select" required>
-                                <option value="en attente" {{ $statutActuel === 'en attente' ? 'selected' : '' }}>En attente</option>
-                                <option value="en cours" {{ $statutActuel === 'en cours' ? 'selected' : '' }}>En cours</option>
-                                <option value="à risque" {{ $statutActuel === 'à risque' ? 'selected' : '' }}>À risque</option>
-                                <option value="clôturé" {{ $statutActuel === 'clôturé' ? 'selected' : '' }}>Clôturé</option>
+                                <option value="en attente" <?php echo e($statutActuel === 'en attente' ? 'selected' : ''); ?>>En attente</option>
+                                <option value="en cours" <?php echo e($statutActuel === 'en cours' ? 'selected' : ''); ?>>En cours</option>
+                                <option value="à risque" <?php echo e($statutActuel === 'à risque' ? 'selected' : ''); ?>>À risque</option>
+                                <option value="clôturé" <?php echo e($statutActuel === 'clôturé' ? 'selected' : ''); ?>>Clôturé</option>
                             </select>
                         </div>
 
@@ -313,7 +315,7 @@
                                 rows="4"
                                 class="form-control"
                                 placeholder="Indiquez les actions réalisées, les difficultés rencontrées, ou les prochaines étapes..."
-                            >{{ old('infos_supplementaires', $demande->infos_supplementaires) }}</textarea>
+                            ><?php echo e(old('infos_supplementaires', $demande->infos_supplementaires)); ?></textarea>
                         </div>
 
                         <div class="col-12 d-flex align-items-center">
@@ -326,11 +328,11 @@
                 </div>
             </div>
         </section>
-    @endif
+    <?php endif; ?>
 
-</div> {{-- .container --}}
+</div> 
 
-{{-- JS traitement AJAX --}}
+
 <script>
     const formTraitement = document.getElementById('form-traitement-demande');
     if (formTraitement) {
@@ -346,10 +348,10 @@
             messageEl.textContent = 'Enregistrement en cours...';
 
             fetch(url, {
-                method: 'POST', // @method('PATCH') est inclus dans le formData
+                method: 'POST', // <?php echo method_field('PATCH'); ?> est inclus dans le formData
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
                 },
                 body: formData
             })
@@ -379,10 +381,10 @@
     }
 </script>
 
-{{-- Laravel Echo / temps réel --}}
-<script src="{{ asset('js/app.js') }}"></script>
+
+<script src="<?php echo e(asset('js/app.js')); ?>"></script>
 <script>
-    Echo.private(`demande.{{ $demande->id }}`)
+    Echo.private(`demande.<?php echo e($demande->id); ?>`)
         .listen('DemandeUpdated', (e) => {
             const statusEl = document.querySelector('.status');
             if (statusEl) {
@@ -396,7 +398,7 @@
         });
 </script>
 
-{{-- Styles spécifiques (timeline) --}}
+
 <style>
     .progress-track {
         display: flex;
@@ -462,4 +464,6 @@
         }
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make(Auth::user()->type == 1 ? 'layouts.appEmployer' : 'layouts.appAdministration', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Gida\resources\views/demandes/show.blade.php ENDPATH**/ ?>

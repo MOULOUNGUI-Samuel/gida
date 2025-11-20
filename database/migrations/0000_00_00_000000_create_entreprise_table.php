@@ -13,6 +13,12 @@ return new class extends Migration
             $table->string('matricule')->nullable();
             $table->string('code')->unique();
             $table->string('nom');
+            $table->string('societe')->nullable();
+            $table->string('adresse')->nullable();
+            $table->string('telephone')->nullable();
+            $table->string('email')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

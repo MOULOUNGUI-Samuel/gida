@@ -1,22 +1,20 @@
-@extends('layouts.appAdministration')
+<?php $__env->startSection('title', 'Dashboard Administrateur - GIDA'); ?>
 
-@section('title', 'Dashboard Administrateur - GIDA')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container my-4">
 
-        {{-- Header --}}
+        
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h4 mb-0">Dashboard Administrateur</h1>
         </div>
 
-        {{-- Statistiques --}}
+        
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
                 <div class="card shadow-sm h-100">
                     <div class="card-body py-3">
                         <h6 class="text-muted mb-1">Total demandes</h6>
-                        <div class="h3 mb-1">{{ $stats['total'] }}</div>
+                        <div class="h3 mb-1"><?php echo e($stats['total']); ?></div>
                         <small class="text-success">+12% ce mois</small>
                     </div>
                 </div>
@@ -25,7 +23,7 @@
                 <div class="card shadow-sm h-100">
                     <div class="card-body py-3">
                         <h6 class="text-muted mb-1">En cours</h6>
-                        <div class="h3 mb-1">{{ $stats['en_cours'] }}</div>
+                        <div class="h3 mb-1"><?php echo e($stats['en_cours']); ?></div>
                         <small class="text-success">+5% cette semaine</small>
                     </div>
                 </div>
@@ -34,7 +32,7 @@
                 <div class="card shadow-sm h-100">
                     <div class="card-body py-3">
                         <h6 class="text-muted mb-1">À risque</h6>
-                        <div class="h3 mb-1">{{ $stats['a_risque'] }}</div>
+                        <div class="h3 mb-1"><?php echo e($stats['a_risque']); ?></div>
                         <small class="text-danger">+2 aujourd'hui</small>
                     </div>
                 </div>
@@ -43,18 +41,18 @@
                 <div class="card shadow-sm h-100">
                     <div class="card-body py-3">
                         <h6 class="text-muted mb-1">Clôturées</h6>
-                        <div class="h3 mb-1">{{ $stats['cloturees'] }}</div>
+                        <div class="h3 mb-1"><?php echo e($stats['cloturees']); ?></div>
                         <small class="text-success">+8% ce mois</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Filtres (simple GET, sans JS) --}}
+        
         <form method="GET" class="row g-2 align-items-end mb-3">
             <div class="col-md-4">
                 <label for="search-input" class="form-label">Recherche</label>
-                <input type="text" id="search-input" name="q" value="{{ request('q') }}" class="form-control"
+                <input type="text" id="search-input" name="q" value="<?php echo e(request('q')); ?>" class="form-control"
                     placeholder="Rechercher une demande...">
             </div>
 
@@ -62,11 +60,11 @@
                 <label for="filter-status" class="form-label">Statut</label>
                 <select id="filter-status" name="status" class="form-select">
                     <option value="">Tous</option>
-                    <option value="en attente" {{ request('status') === 'en attente' ? 'selected' : '' }}>En attente
+                    <option value="en attente" <?php echo e(request('status') === 'en attente' ? 'selected' : ''); ?>>En attente
                     </option>
-                    <option value="en cours" {{ request('status') === 'en cours' ? 'selected' : '' }}>En cours</option>
-                    <option value="à risque" {{ request('status') === 'à risque' ? 'selected' : '' }}>À risque</option>
-                    <option value="clôturé" {{ request('status') === 'clôturé' ? 'selected' : '' }}>Clôturé</option>
+                    <option value="en cours" <?php echo e(request('status') === 'en cours' ? 'selected' : ''); ?>>En cours</option>
+                    <option value="à risque" <?php echo e(request('status') === 'à risque' ? 'selected' : ''); ?>>À risque</option>
+                    <option value="clôturé" <?php echo e(request('status') === 'clôturé' ? 'selected' : ''); ?>>Clôturé</option>
                 </select>
             </div>
 
@@ -74,11 +72,12 @@
                 <label for="filter-company" class="form-label">Société demandeur</label>
                 <select id="filter-company" name="company" class="form-select">
                     <option value="">Toutes</option>
-                    @foreach ($societes as $id => $nom)
-                        <option value="{{ $nom }}" {{ request('company') === $nom ? 'selected' : '' }}>
-                            {{ $nom }}
+                    <?php $__currentLoopData = $societes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $nom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($nom); ?>" <?php echo e(request('company') === $nom ? 'selected' : ''); ?>>
+                            <?php echo e($nom); ?>
+
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
 
@@ -86,12 +85,13 @@
                 <label for="filter-assigned-company" class="form-label">Société affectée</label>
                 <select id="filter-assigned-company" name="assigned_company" class="form-select">
                     <option value="">Toutes</option>
-                    @foreach ($societes as $id => $nom)
-                        <option value="{{ $nom }}" {{ request('assigned_company') === $nom ? 'selected' : '' }}>
-                            {{ $nom }}
+                    <?php $__currentLoopData = $societes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $nom): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($nom); ?>" <?php echo e(request('assigned_company') === $nom ? 'selected' : ''); ?>>
+                            <?php echo e($nom); ?>
+
                         </option>
-                    @endforeach
-                    <option value="non-assignee" {{ request('assigned_company') === 'non-assignee' ? 'selected' : '' }}>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <option value="non-assignee" <?php echo e(request('assigned_company') === 'non-assignee' ? 'selected' : ''); ?>>
                         Non affectées
                     </option>
                 </select>
@@ -101,13 +101,13 @@
                 <button type="submit" class="btn btn-primary btn-sm">
                     Appliquer les filtres
                 </button>
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="<?php echo e(route('dashboard')); ?>" class="btn btn-outline-secondary btn-sm">
                     Réinitialiser
                 </a>
             </div>
         </form>
 
-        {{-- Tableau des demandes --}}
+        
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -125,88 +125,83 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($demandes as $demande)
+                            <?php $__empty_1 = true; $__currentLoopData = $demandes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $demande): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td>{{ $demande->reference }}</td>
-                                    <td>{{ $demande->titre }}</td>
-                                    <td>{{ $demande->user->nom ?? 'N/A' }}</td>
-                                    <td>{{ $demande->societe ?? 'Non spécifiée' }}</td>
+                                    <td><?php echo e($demande->reference); ?></td>
+                                    <td><?php echo e($demande->titre); ?></td>
+                                    <td><?php echo e($demande->user->nom ?? 'N/A'); ?></td>
+                                    <td><?php echo e($demande->societe ?? 'Non spécifiée'); ?></td>
                                     <td>
-                                        @if ($demande->societe_assignee)
+                                        <?php if($demande->societe_assignee): ?>
                                             <span class="badge bg-success">
-                                                {{ $demande->societe_assignee }}
+                                                <?php echo e($demande->societe_assignee); ?>
+
                                             </span>
-                                        @else
+                                        <?php else: ?>
                                             <span class="badge bg-secondary">
                                                 Non affectée
                                             </span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
                                     <td>
-                                        @php $p = strtolower($demande->priorite); @endphp
+                                        <?php $p = strtolower($demande->priorite); ?>
                                         <span
                                             class="badge
-                                        @if ($p === 'normale') bg-success
-                                        @elseif($p === 'urgente') bg-warning text-dark
-                                        @elseif($p === 'critique') bg-danger
-                                        @else bg-secondary @endif
+                                        <?php if($p === 'normale'): ?> bg-success
+                                        <?php elseif($p === 'urgente'): ?> bg-warning text-dark
+                                        <?php elseif($p === 'critique'): ?> bg-danger
+                                        <?php else: ?> bg-secondary <?php endif; ?>
                                     ">
-                                            {{ $demande->priorite }}
+                                            <?php echo e($demande->priorite); ?>
+
                                         </span>
                                     </td>
                                     <td>
-                                        @php $s = strtolower($demande->statut); @endphp
+                                        <?php $s = strtolower($demande->statut); ?>
                                         <span
                                             class="badge
-                                        @if ($s === 'en attente') bg-warning text-dark
-                                        @elseif($s === 'en cours') bg-info text-dark
-                                        @elseif($s === 'à risque') bg-danger
-                                        @elseif($s === 'clôturé') bg-success
-                                        @else bg-secondary @endif
+                                        <?php if($s === 'en attente'): ?> bg-warning text-dark
+                                        <?php elseif($s === 'en cours'): ?> bg-info text-dark
+                                        <?php elseif($s === 'à risque'): ?> bg-danger
+                                        <?php elseif($s === 'clôturé'): ?> bg-success
+                                        <?php else: ?> bg-secondary <?php endif; ?>
                                     ">
-                                            {{ ucfirst($demande->statut) }}
+                                            <?php echo e(ucfirst($demande->statut)); ?>
+
                                         </span>
                                     </td>
                                     <td class="text-end">
-                                        {{-- Voir détails : simple lien vers la fiche --}}
-                                        <a href="{{ route('demandes.show', $demande) }}"
+                                        
+                                        <a href="<?php echo e(route('demandes.show', $demande)); ?>"
                                             class="btn btn-outline-primary btn-sm">
                                             Voir
                                         </a>
 
-                                        {{-- Bouton affectation : ouvre le modal spécifique à cette demande --}}
+                                        
                                         <button type="button" class="btn btn-outline-secondary btn-sm ms-1"
-                                            data-bs-toggle="modal" data-bs-target="#assignmentModal-{{ $demande->id }}">
+                                            data-bs-toggle="modal" data-bs-target="#assignmentModal-<?php echo e($demande->id); ?>">
                                             Affecter
                                         </button>
 
-                                        {{-- (optionnel) suppression / autre action --}}
-                                        {{-- 
-                                    <form method="POST" action="{{ route('admin.demandes.destroy', $demande) }}" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Supprimer cette demande ?')">
-                                            🗑
-                                        </button>
-                                    </form>
-                                    --}}
+                                        
+                                        
                                     </td>
                                 </tr>
 
-                                {{-- Modal d'affectation pour cette demande --}}
-                                <div class="modal fade" id="assignmentModal-{{ $demande->id }}" tabindex="-1"
-                                    aria-labelledby="assignmentModalLabel-{{ $demande->id }}" aria-hidden="true">
+                                
+                                <div class="modal fade" id="assignmentModal-<?php echo e($demande->id); ?>" tabindex="-1"
+                                    aria-labelledby="assignmentModalLabel-<?php echo e($demande->id); ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <form method="POST" action="{{ route('admin.assign-demande') }}">
-                                                @csrf
-                                                <input type="hidden" name="demande_id" value="{{ $demande->id }}">
+                                            <form method="POST" action="<?php echo e(route('admin.assign-demande')); ?>">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="demande_id" value="<?php echo e($demande->id); ?>">
 
                                                 <div class="modal-header">
                                                     <h5 class="modal-title"
-                                                        id="assignmentModalLabel-{{ $demande->id }}">
-                                                        Affectation de la demande #{{ $demande->reference }}
+                                                        id="assignmentModalLabel-<?php echo e($demande->id); ?>">
+                                                        Affectation de la demande #<?php echo e($demande->reference); ?>
+
                                                     </h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Fermer"></button>
@@ -215,49 +210,51 @@
                                                 <div class="modal-body">
                                                     <div class="mb-2">
                                                         <small class="text-muted">
-                                                            <strong>Titre :</strong> {{ $demande->titre }}
+                                                            <strong>Titre :</strong> <?php echo e($demande->titre); ?>
+
                                                         </small>
                                                     </div>
 
                                                     <div class="mb-3">
                                                         <label class="form-label">Société demandeur</label>
                                                         <input type="text" class="form-control-plaintext"
-                                                            value="{{ $demande->societe ?? 'Non spécifiée' }}" readonly>
+                                                            value="<?php echo e($demande->societe ?? 'Non spécifiée'); ?>" readonly>
                                                     </div>
 
                                                     <div class="mb-3">
-                                                        <label for="societe-{{ $demande->id }}" class="form-label">
+                                                        <label for="societe-<?php echo e($demande->id); ?>" class="form-label">
                                                             Société affectée
                                                         </label>
-                                                        <select name="societe" id="societe-{{ $demande->id }}"
+                                                        <select name="societe" id="societe-<?php echo e($demande->id); ?>"
                                                             class="form-select" required>
                                                             <option value="">-- Sélectionner une société --</option>
-                                                            @foreach ($societes as $idSoc => $nomSoc)
-                                                                <option value="{{ $nomSoc }}"
-                                                                    {{ $demande->societe_assignee === $nomSoc ? 'selected' : '' }}>
-                                                                    {{ $nomSoc }}
+                                                            <?php $__currentLoopData = $societes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idSoc => $nomSoc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <option value="<?php echo e($nomSoc); ?>"
+                                                                    <?php echo e($demande->societe_assignee === $nomSoc ? 'selected' : ''); ?>>
+                                                                    <?php echo e($nomSoc); ?>
+
                                                                 </option>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </select>
                                                     </div>
 
                                                     <div class="mb-3">
-                                                        <label for="statut-{{ $demande->id }}" class="form-label">
+                                                        <label for="statut-<?php echo e($demande->id); ?>" class="form-label">
                                                             Statut
                                                         </label>
-                                                        <select name="statut" id="statut-{{ $demande->id }}"
+                                                        <select name="statut" id="statut-<?php echo e($demande->id); ?>"
                                                             class="form-select" required>
                                                             <option value="en attente"
-                                                                {{ $demande->statut === 'en attente' ? 'selected' : '' }}>
+                                                                <?php echo e($demande->statut === 'en attente' ? 'selected' : ''); ?>>
                                                                 En attente</option>
                                                             <option value="en cours"
-                                                                {{ $demande->statut === 'en cours' ? 'selected' : '' }}>En
+                                                                <?php echo e($demande->statut === 'en cours' ? 'selected' : ''); ?>>En
                                                                 cours</option>
                                                             <option value="à risque"
-                                                                {{ $demande->statut === 'à risque' ? 'selected' : '' }}>À
+                                                                <?php echo e($demande->statut === 'à risque' ? 'selected' : ''); ?>>À
                                                                 risque</option>
                                                             <option value="clôturé"
-                                                                {{ $demande->statut === 'clôturé' ? 'selected' : '' }}>
+                                                                <?php echo e($demande->statut === 'clôturé' ? 'selected' : ''); ?>>
                                                                 Clôturé</option>
                                                         </select>
                                                     </div>
@@ -277,25 +274,28 @@
                                     </div>
                                 </div>
 
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="8" class="text-center py-3 text-muted">
                                         Aucune demande trouvée.
                                     </td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
 
-                {{-- si tu as une pagination --}}
-                @if (method_exists($demandes, 'links'))
+                
+                <?php if(method_exists($demandes, 'links')): ?>
                     <div class="card-footer">
-                        {{ $demandes->withQueryString()->links() }}
+                        <?php echo e($demandes->withQueryString()->links()); ?>
+
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.appAdministration', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Gida\resources\views/dashboard.blade.php ENDPATH**/ ?>

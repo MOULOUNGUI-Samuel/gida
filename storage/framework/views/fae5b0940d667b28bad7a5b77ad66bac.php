@@ -255,18 +255,18 @@
             <!-- Body -->
             <div class="login-body">
                 <!-- Error Messages -->
-                @if ($errors->any())
-                    @foreach ($errors->all() as $error)
+                <?php if($errors->any()): ?>
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="alert alert-danger d-flex align-items-center" role="alert">
                             <i class="fas fa-exclamation-circle me-2"></i>
-                            <div>{{ $error }}</div>
+                            <div><?php echo e($error); ?></div>
                         </div>
-                    @endforeach
-                @endif
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php endif; ?>
 
                 <!-- Login Form -->
-                <form method="POST" action="{{ route('login.post') }}" id="login-form">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('login.post')); ?>" id="login-form">
+                    <?php echo csrf_field(); ?>
 
                     <!-- Code Entreprise -->
                     <div class="form-floating mb-3 position-relative">
@@ -275,7 +275,7 @@
                                id="code_entreprise"
                                name="code_entreprise"
                                placeholder="Code entreprise"
-                               value="{{ old('code_entreprise') }}"
+                               value="<?php echo e(old('code_entreprise')); ?>"
                                required
                                autofocus>
                         <label for="code_entreprise">
@@ -290,7 +290,7 @@
                                id="username"
                                name="username"
                                placeholder="Nom d'utilisateur"
-                               value="{{ old('username') }}"
+                               value="<?php echo e(old('username')); ?>"
                                required>
                         <label for="username">
                             <i class="fas fa-user me-2"></i>Nom d'utilisateur
@@ -366,3 +366,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH C:\xampp\htdocs\Gida\resources\views/auth/login.blade.php ENDPATH**/ ?>
