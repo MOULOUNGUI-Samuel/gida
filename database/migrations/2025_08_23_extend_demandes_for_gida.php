@@ -84,55 +84,5 @@ return new class extends Migration
         });
     }
 
-    /**
-     * ANNULATION DE LA MIGRATION (version sécurisée)
-     */
-    public function down(): void
-    {
-        Schema::table('demandes', function (Blueprint $table) {
-
-            // INDEX (vérifier existence via colonnes)
-            if (Schema::hasColumn('demandes', 'workflow_status') &&
-                Schema::hasColumn('demandes', 'societe_assignee')) {
-                $table->dropIndex('idx_workflow_societe');
-            }
-
-            if (Schema::hasColumn('demandes', 'date_escalade')) {
-                $table->dropIndex('idx_date_escalade');
-            }
-
-            if (Schema::hasColumn('demandes', 'assignment_automatique')) {
-                $table->dropIndex('idx_assignment_auto');
-            }
-
-            // FOREIGN KEYS
-            if (Schema::hasColumn('demandes', 'assignee_user_id')) {
-                $table->dropForeign(['assignee_user_id']);
-            }
-
-            if (Schema::hasColumn('demandes', 'validateur_id')) {
-                $table->dropForeign(['validateur_id']);
-            }
-
-            // COLONNES
-            $columns = [
-                'societe_assignee',
-                'assignee_user_id',
-                'workflow_status',
-                'score_qualite',
-                'date_escalade',
-                'validateur_id',
-                'commentaire_validation',
-                'mots_cles_detectes',
-                'assignment_automatique',
-                'temps_traitement_minutes',
-            ];
-
-            foreach ($columns as $col) {
-                if (Schema::hasColumn('demandes', $col)) {
-                    $table->dropColumn($col);
-                }
-            }
-        });
-    }
+    
 };
