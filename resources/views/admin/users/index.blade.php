@@ -22,6 +22,7 @@
                             <th>ID</th>
                             <th>Nom</th>
                             <th>Rôle</th>
+                            <th>Identifiant</th>
                             <th>Code Société</th>
                             <th>Email</th>
                             <th>Entreprise</th>
@@ -33,6 +34,7 @@
                             <tr>
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->nom }}</td>
+                                <td>{{ $user->username }}</td>
                                 <td>
                                     @php
                                         $roleMap = [
