@@ -21,8 +21,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Nom</th>
-                            <th>Rôle</th>
                             <th>Identifiant</th>
+                            <th>Rôle</th>
                             <th>Code Société</th>
                             <th>Email</th>
                             <th>Entreprise</th>
