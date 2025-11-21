@@ -294,15 +294,6 @@
                     <span>Profil</span>
                 </li>
             
-                   
-                {{-- <li onclick="window.location.href='{{ route('evaluation') }}'">
-                    <span class="icon">⭐</span>
-                    <span>Évaluation</span>
-                </li> --}}
-                <li onclick="window.location.href='{{ route('profil') }}'">
-                    <span class="icon">👤</span>
-                    <span>Profil</span>
-                </li>-->
             
                 <li class="logout">
                     <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0; padding: 0;">
