@@ -295,34 +295,10 @@
                 </li>
             
                    
-                <li onclick="window.location.href='{{ route('evaluation') }}'">
+                {{-- <li onclick="window.location.href='{{ route('evaluation') }}'">
                     <span class="icon">⭐</span>
                     <span>Évaluation</span>
-                </li>
-
-
-
-
-
-                 <!-- Contenu principal
-                  
-                     <li onclick="window.location.href='{{ route('messagerie') }}'">
-                    <span class="icon">💬</span>
-                    <span>Messagerie</span>
-                </li>
-                <li onclick="window.location.href='{{ route('evaluation') }}'">
-                    <span class="icon">⭐</span>
-                    <span>Évaluation</span>
-                </li>
-                <li onclick="window.location.href='{{ route('notifications') }}'" style="position: relative; cursor: pointer;">
-                    <span class="icon">🔔</span>
-                    <span>Notifications</span>
-                    @if($nombre_notification_employe > 0)
-                        <span class="nombre-notification">{{ $nombre_notification_employe }}</span>
-                    @endif
-                </li>
-
-                 Contenu principal
+                </li> --}}
                 <li onclick="window.location.href='{{ route('profil') }}'">
                     <span class="icon">👤</span>
                     <span>Profil</span>
