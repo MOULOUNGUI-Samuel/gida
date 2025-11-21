@@ -7,7 +7,7 @@
         <h1>Gestion des utilisateurs</h1>
         <button id="add-user-btn" class="admin-btn">Ajouter un utilisateur</button>
     </div>
-
+ @include('partials.flash-messages')
     <!-- Table des utilisateurs -->
     <div class="table-responsive">
         <table class="admin-table" id="users-table">

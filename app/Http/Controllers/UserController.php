@@ -53,9 +53,17 @@ class UserController extends Controller
     }
 
     /**
-     * Crée un nouvel utilisateur dans la base de données
-     * Convertit les données du formulaire vers la structure de la BDD
+     * Affiche le formulaire de création d'un nouvel utilisateur
      */
+    public function create()
+    {
+        $entreprises = Entreprise::where('active', true)
+            ->orderBy('nom', 'asc')
+            ->get();
+
+        return view('admin.users.create', compact('entreprises'));
+    }
+
     /**
      * Crée un nouvel utilisateur dans la base de données.
      */
@@ -68,15 +76,14 @@ class UserController extends Controller
                 'role'          => 'required|string|in:Administrateur,Employe,Entreprise Support',
                 'company'       => 'required|string|max:255',
                 'password'      => 'required|string|min:6',
-                // ✅ table corrigée : entreprises
                 'entreprise_id' => 'nullable|exists:entreprises,id',
             ],
             [
                 'name.required'          => 'Le nom est obligatoire.',
                 'role.required'          => 'Le rôle est obligatoire.',
                 'role.in'                => 'Le rôle doit être Administrateur, Employe ou Entreprise Support.',
-                'company.required'       => 'Le nom de la société est obligatoire.',
-                'company.max'            => 'Le nom de la société doit contenir au maximum 255 caractères.',
+                'company.required'       => 'Le code société est obligatoire.',
+                'company.max'            => 'Le code société doit contenir au maximum 255 caractères.',
                 'password.required'      => 'Le mot de passe est obligatoire.',
                 'password.min'           => 'Le mot de passe doit contenir au minimum 6 caractères.',
                 'entreprise_id.exists'   => 'L\'entreprise sélectionnée n\'existe pas.',
@@ -108,14 +115,11 @@ class UserController extends Controller
             ]);
 
             return redirect()
-                ->route('users.index')
+                ->route('users')
                 ->with('success', 'Utilisateur créé avec succès.');
         } catch (\Exception $e) {
-            // Si tu veux loguer l’erreur :
-            // \Log::error('Erreur création utilisateur', ['error' => $e->getMessage()]);
-
             return redirect()->back()
-                ->with('error', 'Erreur lors de la création de l\'utilisateur.')
+                ->with('error', 'Erreur lors de la création de l\'utilisateur : ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -142,9 +146,17 @@ class UserController extends Controller
     }
 
     /**
-     * Met à jour un utilisateur existant
-     * Convertit les données du formulaire vers la structure de la BDD
+     * Affiche le formulaire d'édition d'un utilisateur
      */
+    public function edit(User $user)
+    {
+        $entreprises = Entreprise::where('active', true)
+            ->orderBy('nom', 'asc')
+            ->get();
+
+        return view('admin.users.edit', compact('user', 'entreprises'));
+    }
+
     /**
      * Met à jour un utilisateur existant.
      */
@@ -163,8 +175,8 @@ class UserController extends Controller
                 'name.required'          => 'Le nom est obligatoire.',
                 'role.required'          => 'Le rôle est obligatoire.',
                 'role.in'                => 'Le rôle doit être Administrateur, Employe ou Entreprise Support.',
-                'company.required'       => 'Le nom de la société est obligatoire.',
-                'company.max'            => 'Le nom de la société doit contenir au maximum 255 caractères.',
+                'company.required'       => 'Le code société est obligatoire.',
+                'company.max'            => 'Le code société doit contenir au maximum 255 caractères.',
                 'password.min'           => 'Le mot de passe doit contenir au minimum 6 caractères.',
                 'entreprise_id.exists'   => 'L\'entreprise sélectionnée n\'existe pas.',
             ]
@@ -197,13 +209,11 @@ class UserController extends Controller
             $user->update($updateData);
 
             return redirect()
-                ->route('users.index')
+                ->route('users')
                 ->with('success', 'Utilisateur mis à jour avec succès.');
         } catch (\Exception $e) {
-            // \Log::error('Erreur mise à jour utilisateur', ['error' => $e->getMessage()]);
-
             return redirect()->back()
-                ->with('error', 'Erreur lors de la mise à jour de l\'utilisateur.')
+                ->with('error', 'Erreur lors de la mise à jour de l\'utilisateur : ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -211,26 +221,22 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy(User $user): JsonResponse
+    public function destroy(User $user)
     {
         try {
             // Prevent deletion of the current authenticated user
             if (Auth::id() === $user->id) {
-                return response()->json([
-                    'message' => 'Vous ne pouvez pas supprimer votre propre compte'
-                ], 403);
+                return redirect()->back()
+                    ->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
             }
 
             $user->delete();
 
-            return response()->json([
-                'message' => 'Utilisateur supprimé avec succès'
-            ]);
+            return redirect()->route('users')
+                ->with('success', 'Utilisateur supprimé avec succès.');
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la suppression de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
         }
     }
 }

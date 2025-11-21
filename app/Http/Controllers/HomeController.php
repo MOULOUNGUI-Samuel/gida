@@ -215,9 +215,10 @@ class HomeController extends Controller
 
     public function users()
     {
-        // Remove the 'with' clause since we're using API calls for user management
-        $users = User::orderBy('created_at', 'desc')->get();
-        return view('admin.users', compact('users'));
+        $users = User::with('entreprise')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('admin.users.index', compact('users'));
     }
 
 
