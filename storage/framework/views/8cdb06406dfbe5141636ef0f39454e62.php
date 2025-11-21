@@ -21,6 +21,7 @@
                             <th>Nom</th>
                             <th>Rôle</th>
                             <th>Code Société</th>
+                            <th>Email</th>
                             <th>Entreprise</th>
                             <th>Actions</th>
                         </tr>
@@ -42,6 +43,7 @@
                                     <span class="badge bg-<?php echo e($roleInfo['class']); ?>"><?php echo e($roleInfo['label']); ?></span>
                                 </td>
                                 <td><?php echo e($user->code_entreprise ?? '-'); ?></td>
+                                <td><?php echo e($user->email ?? '-'); ?></td>
                                 <td><?php echo e($user->entreprise->nom ?? '-'); ?></td>
                                 <td>
                                     <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-sm btn-warning">

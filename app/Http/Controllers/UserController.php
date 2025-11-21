@@ -109,6 +109,8 @@ class UserController extends Controller
                 'type'           => $typeMap[$request->role] ?? 1,
                 'code_entreprise'=> $request->company,
                 'entreprise_id'  => $request->entreprise_id,
+                'societe'          => $request->company,
+                'email'           => $request->email,
                 'username'       => strtolower(str_replace(' ', '.', $request->name)),
                 'matricule'      => 'USR' . time(),
                 'password'       => Hash::make($request->password),
@@ -168,6 +170,7 @@ class UserController extends Controller
                 'name'          => 'required|string|max:255',
                 'role'          => 'required|string|in:Administrateur,Employe,Entreprise Support',
                 'company'       => 'required|string|max:255',
+                'email'          => 'required|email',
                 'password'      => 'nullable|string|min:6',
                 'entreprise_id' => 'nullable|exists:entreprises,id',
             ],
@@ -177,6 +180,9 @@ class UserController extends Controller
                 'role.in'                => 'Le rôle doit être Administrateur, Employe ou Entreprise Support.',
                 'company.required'       => 'Le code société est obligatoire.',
                 'company.max'            => 'Le code société doit contenir au maximum 255 caractères.',
+                'email.required'          => 'L\'email est obligatoire.',
+
+                'email.email'             => 'L\'email doit être une adresse email valide.',
                 'password.min'           => 'Le mot de passe doit contenir au minimum 6 caractères.',
                 'entreprise_id.exists'   => 'L\'entreprise sélectionnée n\'existe pas.',
             ]
@@ -198,6 +204,7 @@ class UserController extends Controller
             $updateData = [
                 'nom'            => $request->name,
                 'type'           => $typeMap[$request->role] ?? 1,
+                'email'          => $request->email,
                 'code_entreprise'=> $request->company,
                 'entreprise_id'  => $request->entreprise_id,
             ];

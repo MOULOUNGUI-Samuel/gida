@@ -23,6 +23,7 @@
                             <th>Nom</th>
                             <th>Rôle</th>
                             <th>Code Société</th>
+                            <th>Email</th>
                             <th>Entreprise</th>
                             <th>Actions</th>
                         </tr>
@@ -44,6 +45,7 @@
                                     <span class="badge bg-{{ $roleInfo['class'] }}">{{ $roleInfo['label'] }}</span>
                                 </td>
                                 <td>{{ $user->code_entreprise ?? '-' }}</td>
+                                <td>{{ $user->email ?? '-' }}</td>
                                 <td>{{ $user->entreprise->nom ?? '-' }}</td>
                                 <td>
                                     <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">
