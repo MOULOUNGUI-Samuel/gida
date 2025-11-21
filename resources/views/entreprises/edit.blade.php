@@ -51,7 +51,7 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="societe" class="form-label">Société</label>
+                            <label for="societe" class="form-label">Raison sociale</label>
                             <input type="text" class="form-control @error('societe') is-invalid @enderror" id="societe"
                                 name="societe" value="{{ old('societe', $entreprise->societe) }}">
                             @error('societe')

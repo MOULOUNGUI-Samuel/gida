@@ -21,7 +21,7 @@
                             <th>Code</th>
                             <th>Nom</th>
                             <th>Matricule</th>
-                            <th>Société</th>
+                            <th>Raison sociale</th>
                             <th>Email</th>
                             <th>Téléphone</th>
                             <th>Utilisateurs</th>

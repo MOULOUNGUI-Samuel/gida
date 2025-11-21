@@ -164,7 +164,7 @@ class EntrepriseController extends Controller
                 'telephone'  => 'nullable|string|max:20',
                 'email'      => 'nullable|email|max:255',
                 'description'=> 'nullable|string|max:255',
-                'logo'       => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
+                'logo'       => 'nullable',
                 'active'     => 'nullable|boolean',
             ],
             [
@@ -179,9 +179,8 @@ class EntrepriseController extends Controller
                 'telephone.max'     => 'Le numéro de téléphone doit contenir au maximum 20 caractères.',
                 'email.max'         => 'L\'email doit contenir au maximum 255 caractères.',
                 'description.max'   => 'La description doit contenir au maximum 255 caractères.',
-                'logo.image'        => 'Le fichier doit être une image.',
-                'logo.mimes'        => 'Le logo doit être au format JPEG, JPG, PNG ou GIF.',
-                'logo.max'          => 'Le logo ne doit pas dépasser 2 Mo.',
+                'logo'              => 'nullable',
+                'active'     => 'nullable|boolean',
             ]
         );
 
