@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -21,26 +22,26 @@ class UserController extends Controller
         try {
             // Récupération des utilisateurs avec mapping des champs de la BDD vers l'interface
             $users = User::with('entreprise')
-                         ->select('id', 'nom as name', 'type', 'code_entreprise as company', 'entreprise_id')
-                         ->orderBy('created_at', 'desc')
-                         ->get()
-                         ->map(function ($user) {
-                             // Conversion du type numérique vers un rôle lisible
-                             $roleMap = [
-                                 0 => 'Administrateur',      // Type 0 = Administrateur
-                                 1 => 'Employe',             // Type 1 = Employé
-                                 2 => 'Entreprise Support'   // Type 2 = Support Entreprise
-                             ];
+                ->select('id', 'nom as name', 'type', 'code_entreprise as company', 'entreprise_id')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($user) {
+                    // Conversion du type numérique vers un rôle lisible
+                    $roleMap = [
+                        0 => 'Administrateur',      // Type 0 = Administrateur
+                        1 => 'Employe',             // Type 1 = Employé
+                        2 => 'Entreprise Support'   // Type 2 = Support Entreprise
+                    ];
 
-                             return [
-                                 'id' => $user->id,
-                                 'name' => $user->name,
-                                 'role' => $roleMap[$user->type] ?? 'Employe',
-                                 'company' => $user->company ?? 'Non définie',
-                                 'entreprise_id' => $user->entreprise_id,
-                                 'entreprise_nom' => $user->entreprise ? $user->entreprise->nom : null
-                             ];
-                         });
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'role' => $roleMap[$user->type] ?? 'Employe',
+                        'company' => $user->company ?? 'Non définie',
+                        'entreprise_id' => $user->entreprise_id,
+                        'entreprise_nom' => $user->entreprise ? $user->entreprise->nom : null
+                    ];
+                });
 
             return response()->json($users);
         } catch (\Exception $e) {
@@ -55,59 +56,67 @@ class UserController extends Controller
      * Crée un nouvel utilisateur dans la base de données
      * Convertit les données du formulaire vers la structure de la BDD
      */
-    public function store(Request $request): JsonResponse
+    /**
+     * Crée un nouvel utilisateur dans la base de données.
+     */
+    public function store(Request $request)
     {
-        // Validation des données reçues du formulaire
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'role' => 'required|string|in:Administrateur,Employe,Entreprise Support',
-            'company' => 'required|string|max:255',
-            'password' => 'required|string|min:6',
-            'entreprise_id' => 'nullable|exists:entreprise,id',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name'          => 'required|string|max:255',
+                'role'          => 'required|string|in:Administrateur,Employe,Entreprise Support',
+                'company'       => 'required|string|max:255',
+                'password'      => 'required|string|min:6',
+                // ✅ table corrigée : entreprises
+                'entreprise_id' => 'nullable|exists:entreprises,id',
+            ],
+            [
+                'name.required'          => 'Le nom est obligatoire.',
+                'role.required'          => 'Le rôle est obligatoire.',
+                'role.in'                => 'Le rôle doit être Administrateur, Employe ou Entreprise Support.',
+                'company.required'       => 'Le nom de la société est obligatoire.',
+                'company.max'            => 'Le nom de la société doit contenir au maximum 255 caractères.',
+                'password.required'      => 'Le mot de passe est obligatoire.',
+                'password.min'           => 'Le mot de passe doit contenir au minimum 6 caractères.',
+                'entreprise_id.exists'   => 'L\'entreprise sélectionnée n\'existe pas.',
+            ]
+        );
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
-            // Conversion du rôle texte vers le type numérique de la BDD
+            // Conversion rôle texte -> type numérique
             $typeMap = [
-                'Administrateur' => 0,        // Administrateur = type 0
-                'Employe' => 1,               // Employé = type 1
-                'Entreprise Support' => 2     // Support Entreprise = type 2
+                'Administrateur'     => 0,
+                'Employe'            => 1,
+                'Entreprise Support' => 2,
             ];
 
-            // Création de l'utilisateur avec les champs de la BDD
             $user = User::create([
-                'nom' => $request->name,                    // nom au lieu de name
-                'type' => $typeMap[$request->role],         // type numérique au lieu de role
-                'code_entreprise' => $request->company,     // code_entreprise au lieu de company
-                'entreprise_id' => $request->entreprise_id, // ID de l'entreprise
-                'username' => strtolower(str_replace(' ', '.', $request->name)), // génération automatique du username
-                'matricule' => 'USR' . time(),              // génération automatique du matricule
-                'password' => Hash::make($request->password), // mot de passe fourni par l'utilisateur
+                'nom'            => $request->name,
+                'type'           => $typeMap[$request->role] ?? 1,
+                'code_entreprise'=> $request->company,
+                'entreprise_id'  => $request->entreprise_id,
+                'username'       => strtolower(str_replace(' ', '.', $request->name)),
+                'matricule'      => 'USR' . time(),
+                'password'       => Hash::make($request->password),
             ]);
 
-            // Retour des données formatées pour l'interface
-            return response()->json([
-                'message' => 'Utilisateur créé avec succès',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->nom,
-                    'role' => $request->role,
-                    'company' => $user->code_entreprise,
-                    'entreprise_id' => $user->entreprise_id,
-                ]
-            ], 201);
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'Utilisateur créé avec succès.');
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la création de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
+            // Si tu veux loguer l’erreur :
+            // \Log::error('Erreur création utilisateur', ['error' => $e->getMessage()]);
+
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la création de l\'utilisateur.')
+                ->withInput();
         }
     }
 
@@ -123,7 +132,7 @@ class UserController extends Controller
             1 => 'Gestionnaire',
             2 => 'employe'
         ];
-        
+
         return response()->json([
             'id' => $user->id,
             'name' => $user->nom,                               // nom depuis la BDD
@@ -136,64 +145,66 @@ class UserController extends Controller
      * Met à jour un utilisateur existant
      * Convertit les données du formulaire vers la structure de la BDD
      */
-    public function update(Request $request, User $user): JsonResponse
+    /**
+     * Met à jour un utilisateur existant.
+     */
+    public function update(Request $request, User $user)
     {
-        // Validation des données reçues
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'role' => 'required|string|in:Administrateur,Employe,Entreprise Support',
-            'company' => 'required|string|max:255',
-            'password' => 'nullable|string|min:6',
-            'entreprise_id' => 'nullable|exists:entreprise,id',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name'          => 'required|string|max:255',
+                'role'          => 'required|string|in:Administrateur,Employe,Entreprise Support',
+                'company'       => 'required|string|max:255',
+                'password'      => 'nullable|string|min:6',
+                'entreprise_id' => 'nullable|exists:entreprises,id',
+            ],
+            [
+                'name.required'          => 'Le nom est obligatoire.',
+                'role.required'          => 'Le rôle est obligatoire.',
+                'role.in'                => 'Le rôle doit être Administrateur, Employe ou Entreprise Support.',
+                'company.required'       => 'Le nom de la société est obligatoire.',
+                'company.max'            => 'Le nom de la société doit contenir au maximum 255 caractères.',
+                'password.min'           => 'Le mot de passe doit contenir au minimum 6 caractères.',
+                'entreprise_id.exists'   => 'L\'entreprise sélectionnée n\'existe pas.',
+            ]
+        );
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
-            // Conversion du rôle texte vers le type numérique
             $typeMap = [
-                'Administrateur' => 0,        // Administrateur = type 0
-                'Employe' => 1,               // Employé = type 1
-                'Entreprise Support' => 2     // Support Entreprise = type 2
+                'Administrateur'     => 0,
+                'Employe'            => 1,
+                'Entreprise Support' => 2,
             ];
 
-            // Préparation des données à mettre à jour avec les vrais champs de la BDD
             $updateData = [
-                'nom' => $request->name,                    // nom au lieu de name
-                'type' => $typeMap[$request->role],         // type numérique au lieu de role
-                'code_entreprise' => $request->company,     // code_entreprise au lieu de company
-                'entreprise_id' => $request->entreprise_id, // ID de l'entreprise
+                'nom'            => $request->name,
+                'type'           => $typeMap[$request->role] ?? 1,
+                'code_entreprise'=> $request->company,
+                'entreprise_id'  => $request->entreprise_id,
             ];
 
-            // Ajouter le mot de passe seulement s'il est fourni
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
 
-            // Mise à jour de l'utilisateur
             $user->update($updateData);
 
-            // Retour des données formatées pour l'interface
-            return response()->json([
-                'message' => 'Utilisateur mis à jour avec succès',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->nom,
-                    'role' => $request->role,
-                    'company' => $user->code_entreprise,
-                    'entreprise_id' => $user->entreprise_id,
-                ]
-            ]);
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'Utilisateur mis à jour avec succès.');
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la mise à jour de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
+            // \Log::error('Erreur mise à jour utilisateur', ['error' => $e->getMessage()]);
+
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la mise à jour de l\'utilisateur.')
+                ->withInput();
         }
     }
 
@@ -204,7 +215,7 @@ class UserController extends Controller
     {
         try {
             // Prevent deletion of the current authenticated user
-            if (auth()->id() === $user->id) {
+            if (Auth::id() === $user->id) {
                 return response()->json([
                     'message' => 'Vous ne pouvez pas supprimer votre propre compte'
                 ], 403);

@@ -43,19 +43,19 @@
                         <label for="user-role">Rôle</label>
                         <select id="user-role" name="role" required>
                             <option value="">Sélectionner un rôle</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Gestionnaire">Gestionnaire</option>
-                            <option value="Support">Support</option>
+                            <option value="Administrateur">Administrateur</option>
+                            <option value="Employe">Employe</option>
+                            <option value="Entreprise Support">Entreprise Support</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="user-company">Société</label>
-                        <select id="user-company" name="company" required>
-                            <option value="">Sélectionner une société</option>
-                            <option value="COMKETING">COMKETING</option>
-                            <option value="YOD INGÉNIERIE">YOD INGÉNIERIE</option>
-                            <option value="FCI">FCI</option>
-                            <option value="ALPHON CONSULTING">ALPHON CONSULTING</option>
+                        <label for="user-company">Code Société</label>
+                        <input type="text" id="user-company" name="company" required placeholder="Ex: COMKETING">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-entreprise">Entreprise</label>
+                        <select id="user-entreprise" name="entreprise_id">
+                            <option value="">Sélectionner une entreprise</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -276,8 +276,9 @@
     <script>
         // Variables globales
         let users = [];
+        let entreprises = [];
         let currentEditingUser = null;
-        
+
         // Éléments DOM
         const modal = document.getElementById('user-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -289,10 +290,11 @@
         const usersBody = document.getElementById('users-body');
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
-        
+
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             loadUsers();
+            loadEntreprises();
             initEventListeners();
         });
         
@@ -314,6 +316,37 @@
         }
         
         /**
+         * Charge les entreprises depuis le serveur
+         */
+        async function loadEntreprises() {
+            try {
+                const response = await fetch('/api/entreprises');
+                if (response.ok) {
+                    entreprises = await response.json();
+                    populateEntreprisesSelect();
+                } else {
+                    console.error('Erreur lors du chargement des entreprises');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        /**
+         * Remplit le sélecteur d'entreprises
+         */
+        function populateEntreprisesSelect() {
+            const select = document.getElementById('user-entreprise');
+            select.innerHTML = '<option value="">Sélectionner une entreprise</option>';
+            entreprises.forEach(entreprise => {
+                const option = document.createElement('option');
+                option.value = entreprise.id;
+                option.textContent = entreprise.nom || entreprise.societe;
+                select.appendChild(option);
+            });
+        }
+
+        /**
          * Charge les utilisateurs depuis le serveur
          */
         async function loadUsers() {
@@ -327,12 +360,7 @@
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                // Données de test en cas d'erreur
-                users = [
-                    { id: 1, name: 'Admin Test', email: 'admin@test.com', role: 'Admin', company: 'GIDA' },
-                    { id: 2, name: 'Gestionnaire Test', email: 'gestionnaire@test.com', role: 'Gestionnaire', company: 'GIDA' }
-                ];
-                renderUserTable();
+                showToast('Erreur lors du chargement des utilisateurs', 'error');
             }
         }
         
@@ -364,15 +392,16 @@
          */
         function openUserModal(userId = null) {
             currentEditingUser = userId ? users.find(u => u.id === userId) : null;
-            
+
             modalTitle.textContent = currentEditingUser ? 'Modifier un utilisateur' : 'Ajouter un utilisateur';
-            
+
             // Remplir les champs du formulaire
             document.getElementById('user-name').value = currentEditingUser ? currentEditingUser.name : '';
             document.getElementById('user-role').value = currentEditingUser ? currentEditingUser.role : '';
             document.getElementById('user-company').value = currentEditingUser ? currentEditingUser.company : '';
+            document.getElementById('user-entreprise').value = currentEditingUser ? (currentEditingUser.entreprise_id || '') : '';
             document.getElementById('user-password').value = ''; // Toujours vider le mot de passe
-            
+
             modal.classList.remove('hidden');
         }
         
@@ -408,18 +437,19 @@
             const userData = {
                 name: formData.get('name'),
                 role: formData.get('role'),
-                company: formData.get('company')
+                company: formData.get('company'),
+                entreprise_id: formData.get('entreprise_id') || null
             };
 
             // Ajouter le mot de passe seulement s'il n'est pas vide
             if (password && password.trim() !== '') {
                 userData.password = password;
             }
-            
+
             try {
                 const url = currentEditingUser ? `/api/users/${currentEditingUser.id}` : '/api/users';
                 const method = currentEditingUser ? 'PUT' : 'POST';
-                
+
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -428,24 +458,10 @@
                     },
                     body: JSON.stringify(userData)
                 });
-                
+
                 if (response.ok) {
-                    const result = await response.json();
-                    
-                    if (currentEditingUser) {
-                        // Mise à jour
-                        const index = users.findIndex(u => u.id === currentEditingUser.id);
-                        if (index !== -1) {
-                            users[index] = { ...users[index], ...userData };
-                        }
-                        showToast('Utilisateur modifié avec succès', 'success');
-                    } else {
-                        // Ajout
-                        users.push(result.user);
-                        showToast('Utilisateur ajouté avec succès', 'success');
-                    }
-                    
-                    renderUserTable();
+                    showToast('Utilisateur ' + (currentEditingUser ? 'modifié' : 'ajouté') + ' avec succès', 'success');
+                    loadUsers(); // Recharger la liste complète
                     closeModal();
                 } else {
                     const error = await response.json();

@@ -4,10 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * MIGRATION GIDA - EXTENSION TABLE DEMANDES
- * Ajoute les champs nécessaires pour le workflow GIDA
- */
 return new class extends Migration
 {
     /**
@@ -83,6 +79,4 @@ return new class extends Migration
             $table->index(['assignment_automatique'], 'idx_assignment_auto');
         });
     }
-
-    
 };

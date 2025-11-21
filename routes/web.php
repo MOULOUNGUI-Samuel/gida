@@ -92,19 +92,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/entreprises/{entreprise}/toggle-active', [EntrepriseController::class, 'toggleActive'])->name('entreprises.toggle-active');
 
     
-    // API Routes pour la gestion des utilisateurs
+    // API Routes pour la gestion des utilisateurs et entreprises
     Route::prefix('api')->group(function () {
+        // Users API
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);
         Route::get('/users/{user}', [UserController::class, 'show']);
         Route::put('/users/{user}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
-        
+
+        // Entreprises API
+        Route::get('/entreprises', [EntrepriseController::class, 'apiIndex']);
+
         // API Routes pour le chatbot (commentées car ChatbotController n'existe pas encore)
         // Route::post('/chatbot/message', [ChatbotController::class, 'sendMessage']);
         // Route::get('/chatbot/history', [ChatbotController::class, 'getChatHistory']);
         // Route::post('/chatbot/escalate', [ChatbotController::class, 'escalateToAdmin']);
-        
 
     });
 });

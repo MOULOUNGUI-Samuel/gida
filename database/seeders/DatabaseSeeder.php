@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EntrepriseSeeder::class,  // D'abord les entreprises
             AdminUserSeeder::class,
-            AddUsersSeeder::class,
             UserSeeder::class,        // Puis les utilisateurs de test
         ]);
     }

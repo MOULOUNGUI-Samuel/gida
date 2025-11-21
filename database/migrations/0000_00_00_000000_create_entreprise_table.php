@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('entreprise', function (Blueprint $table) {
+        Schema::create('entreprises', function (Blueprint $table) {
             $table->id(); // PK auto-incrémentée
             $table->string('matricule')->nullable();
             $table->string('code')->unique();
@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('telephone')->nullable();
             $table->string('email')->nullable();
             $table->text('description')->nullable();
+            $table->string('logo')->nullable(); // Chemin vers le logo
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('entreprise');
+        Schema::dropIfExists('entreprises');
     }
 };

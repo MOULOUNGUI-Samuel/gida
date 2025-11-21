@@ -175,10 +175,12 @@
                                         </a>
 
                                         {{-- Bouton affectation : ouvre le modal spécifique à cette demande --}}
+                                        @if ($s !== 'clôturé' && $s !== 'en cours')
                                         <button type="button" class="btn btn-outline-secondary btn-sm ms-1"
                                             data-bs-toggle="modal" data-bs-target="#assignmentModal-{{ $demande->id }}">
                                             Affecter
                                         </button>
+                                        @endif
 
                                         {{-- (optionnel) suppression / autre action --}}
                                         {{-- 

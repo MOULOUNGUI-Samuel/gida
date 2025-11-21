@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Entreprise extends Model
 {
-    protected $table = 'entreprise';
+    protected $table = 'entreprises';
     protected $fillable = [
         'matricule',
         'code',
@@ -17,6 +17,7 @@ class Entreprise extends Model
         'telephone',
         'email',
         'description',
+        'logo',
         'active'
     ];
     public $timestamps = true;

@@ -258,7 +258,7 @@
                                 <a href="{{ route('demandes.edit', $demande->id) }}" class="btn btn-primary btn-sm">
                                     Modifier le statut
                                 </a>
-                                <a href="{{ route('dashboardEmployer') }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
                                     Retour à la liste
                                 </a>
                             </div>
@@ -266,7 +266,7 @@
                     @else
                         <div class="user-actions">
                             <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ route('dashboardEmployer') }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
                                     Retour au tableau de bord
                                 </a>
                             </div>
@@ -278,7 +278,7 @@
         </div> {{-- card --}}
     </section>
 
-    {{-- BLOC DE TRAITEMENT DE LA DEMANDE (Support / Admin) --}}
+    {{-- BLOC DE TRAITEMENT DE LA DEMANDE (Administrateur / Entreprise Support) --}}
     @if(in_array(Auth::user()->type, [0, 2]) && strtolower($demande->statut) !== 'clôturé')
         <section class="mt-4">
             <div class="card shadow-sm">

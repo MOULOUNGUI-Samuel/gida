@@ -12,8 +12,8 @@ return new class extends Migration
             if (!Schema::hasColumn('demandes', 'entreprise_id')) {
                 $table->unsignedBigInteger('entreprise_id')->nullable()->after('assignee_user_id');
                 $table->index('entreprise_id');
-                // FK to entreprise table (table name is 'entreprise')
-                $table->foreign('entreprise_id')->references('id')->on('entreprise')->onDelete('set null');
+                // FK to entreprises table
+                $table->foreign('entreprise_id')->references('id')->on('entreprises')->onDelete('set null');
             }
         });
     }

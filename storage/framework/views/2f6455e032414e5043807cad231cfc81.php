@@ -260,7 +260,7 @@
                                 <a href="<?php echo e(route('demandes.edit', $demande->id)); ?>" class="btn btn-primary btn-sm">
                                     Modifier le statut
                                 </a>
-                                <a href="<?php echo e(route('dashboardEmployer')); ?>" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary btn-sm">
                                     Retour à la liste
                                 </a>
                             </div>
@@ -268,7 +268,7 @@
                     <?php else: ?>
                         <div class="user-actions">
                             <div class="d-flex flex-wrap gap-2">
-                                <a href="<?php echo e(route('dashboardEmployer')); ?>" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary btn-sm">
                                     Retour au tableau de bord
                                 </a>
                             </div>

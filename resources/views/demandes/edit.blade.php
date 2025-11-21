@@ -6,7 +6,7 @@
     <!-- HEADER UTILISATEUR + CTA -->
     <div class="gida-header" id="gida-header">
       <h1>Modifier la demande #{{ $demande->id }}</h1>
-      <button class="gida-btn" onclick="window.location.href='{{ route('dashboardEmployer') }}'">← Retour au tableau de bord</button>
+      <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">← Retour au tableau de bord</a>
     </div>
 
     <!-- FORMULAIRE DE MODIFICATION -->
